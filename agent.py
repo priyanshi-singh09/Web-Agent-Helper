@@ -46,6 +46,14 @@ else:
     index = faiss.IndexFlatIP(dim)
     keys = []
 
+def classify_query(query: str) -> bool:
+    prompt = f"Is this a valid web search query? Answer YES or NO.\nQuery: {query}"
+    try:
+        response = chat.send_message(prompt)
+        return response.text.strip().upper().startswith("YES")
+    except Exception:
+        return False
+
 def fetch_search_results(query: str) -> str:
     headers = {"User-Agent": "Mozilla/5.0"}
     resp = requests.get(f"https://duckduckgo.com/html?q={query}", headers=headers, timeout=15)
