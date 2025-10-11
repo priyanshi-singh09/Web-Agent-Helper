@@ -65,6 +65,16 @@ def search_vector_cache(query: str):
         return redis_client.get(orig_q).decode()
     return None
 
+def store_cache(query: str, result: str):
+    redis_client.set(query, result)
+    vec = embedder.encode(query.lower())
+    faiss.normalize_L2(vec.reshape(1, -1))
+    index.add(vec.reshape(1, -1))
+    keys.append(query)
+    faiss.write_index(index, VECTOR_INDEX_PATH)
+    with open(VECTOR_INDEX_PATH + '.keys', 'wb') as f:
+        np.save(f, np.array(keys, dtype=object))
+
 def fetch_search_results(query: str) -> str:
     headers = {"User-Agent": "Mozilla/5.0"}
     resp = requests.get(f"https://duckduckgo.com/html?q={query}", headers=headers, timeout=15)
