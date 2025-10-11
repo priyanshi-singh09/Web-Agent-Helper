@@ -19,6 +19,7 @@ genai.configure(api_key=GEMINI_API_KEY)
 model = genai.GenerativeModel("models/gemini-2.5-flash")
 chat = model.start_chat()
 
+#Added get summary function
 def get_summary(text: str) -> str:
     try:
         response = chat.send_message(f"Summarize the following content: {text}")
