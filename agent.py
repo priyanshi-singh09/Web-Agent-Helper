@@ -4,6 +4,9 @@ import numpy as np
 import google.generativeai as genai
 from sentence_transformers import SentenceTransformer
 import faiss
+import requests
+from bs4 import BeautifulSoup
+from urllib.parse import urlparse, parse_qs, unquote
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -72,4 +75,54 @@ def store_cache(query: str, result: str):
     faiss.write_index(index, VECTOR_INDEX_PATH)
     with open(VECTOR_INDEX_PATH + '.keys', 'wb') as f:
         np.save(f, np.array(keys, dtype=object))
+
+import requests
+from bs4 import BeautifulSoup
+from urllib.parse import urlparse, parse_qs, unquote
+
+def fetch_search_results(query: str) -> str:
+    headers = {"User-Agent": "Mozilla/5.0"}
+    resp = requests.get(f"https://duckduckgo.com/html?q={query}", headers=headers, timeout=15)
+    if resp.status_code != 200:
+        return "Failed to fetch search results."
+    soup = BeautifulSoup(resp.text, 'html.parser')
+    anchors = soup.find_all('a', class_='result__a')[:5]
+    urls = [a.get('href') for a in anchors if a.get('href')]
+    if not urls:
+        return "No results could be processed."
+
+    collected_text = []
+    for url in urls:
+        if url.startswith("//"):
+            url = "https:" + url
+        if "/l/?uddg=" in url:
+            parsed = urlparse(url)
+            qs = parse_qs(parsed.query)
+            url = unquote(qs.get('uddg', [url])[0])
+        try:
+            dr = requests.get(url, headers=headers, timeout=15)
+            if dr.status_code != 200:
+                continue
+            ps = BeautifulSoup(dr.text, 'html.parser').find_all('p')[:5]
+            brief = "\n".join([p.get_text(strip=True) for p in ps])
+            if brief:
+                collected_text.append(brief)
+        except Exception as e:
+            print(f"Error processing {url}: {e}")
+            continue
+
+    combined = "\n".join(collected_text)
+    return get_summary(combined) if combined else "No content to summarize."
+
+def answer_query(raw_query: str) -> str:
+    query = raw_query.lower().strip()
+    if not classify_query(query):
+        return "❌ Invalid query."
+    cached = search_vector_cache(query)
+    if cached:
+        return cached
+    result = fetch_search_results(query)
+    store_cache(query, result)
+    return result
+
 
