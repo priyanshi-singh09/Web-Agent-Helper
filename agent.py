@@ -40,5 +40,15 @@ if os.path.exists(VECTOR_INDEX_PATH):
 else:
     dim = embedder.get_sentence_embedding_dimension()
     index = faiss.IndexFlatIP(dim)
-    keys = []
+    keys = 
+
+
+def classify_query(query: str) -> bool:
+    prompt = f"Is this a valid web search query? Answer YES or NO.\nQuery: {query}"
+    try:
+        response = chat.send_message(prompt)
+        return response.text.strip().upper().startswith("YES")
+    except Exception:
+        return False
+
 
