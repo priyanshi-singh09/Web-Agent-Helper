@@ -5,6 +5,19 @@ export default function App() {
   const [answer, setAnswer] = useState('')
   const [loading, setLoading] = useState(false)
 
+  const handleSubmit = async e => {
+    e.preventDefault()
+    setLoading(true)
+    const res = await fetch('http://localhost:8000/query', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: query })
+    })
+    const data = await res.json()
+    setAnswer(data.answer)
+    setLoading(false)
+  }
+  
   return (
     <div className="min-h-screen w-screen flex flex-col items-center justify-center bg-gradient-to-br from-indigo-50 to-cyan-100 px-4 py-8">
       <div className="w-full max-w-2xl bg-white shadow-xl rounded-[2rem] p-6 md:p-8 border border-gray-100 space-y-6">
