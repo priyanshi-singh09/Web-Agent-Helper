@@ -54,6 +54,17 @@ def classify_query(query: str) -> bool:
     except Exception:
         return False
 
+def search_vector_cache(query: str):
+    vec = embedder.encode(query.lower())
+    faiss.normalize_L2(vec.reshape(1, -1))
+    if index.ntotal == 0:
+        return None
+    D, I = index.search(vec.reshape(1, -1), 1)
+    if D[0][0] >= SIM_THRESHOLD:
+        orig_q = keys[I[0][0]]
+        return redis_client.get(orig_q).decode()
+    return None
+
 def fetch_search_results(query: str) -> str:
     headers = {"User-Agent": "Mozilla/5.0"}
     resp = requests.get(f"https://duckduckgo.com/html?q={query}", headers=headers, timeout=15)
