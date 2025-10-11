@@ -80,3 +80,14 @@ def fetch_search_results(query: str) -> str:
 
     combined = "\n".join(collected_text)
     return get_summary(combined) if combined else "No content to summarize."
+
+def answer_query(raw_query: str) -> str:
+    query = raw_query.lower().strip()
+    if not classify_query(query):
+        return "❌ Invalid query."
+    cached = search_vector_cache(query)
+    if cached:
+        return cached
+    result = fetch_search_results(query)
+    store_cache(query, result)
+    return result
