@@ -2,6 +2,8 @@ import os
 import redis
 import numpy as np
 import google.generativeai as genai
+from sentence_transformers import SentenceTransformer
+import faiss
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -27,4 +29,16 @@ def get_summary(text: str) -> str:
     except Exception as e:
         print(f"Summarization error: {e}")
         return ""
+
+embedder = SentenceTransformer(EMBEDDING_MODEL)
+
+
+if os.path.exists(VECTOR_INDEX_PATH):
+    index = faiss.read_index(VECTOR_INDEX_PATH)
+    with open(VECTOR_INDEX_PATH + '.keys', 'rb') as f:
+        keys = np.load(f, allow_pickle=True).tolist()
+else:
+    dim = embedder.get_sentence_embedding_dimension()
+    index = faiss.IndexFlatIP(dim)
+    keys = []
 
