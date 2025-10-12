@@ -198,3 +198,33 @@ npm run build
 - Implement rate limiting for production
 - Add authentication for production deployments
 - Use HTTPS for all API communications
+
+## 🐛 Troubleshooting
+
+**Redis Connection Error:**
+- Ensure Redis server is running: `redis-cli ping`
+- Check REDIS_URL in `.env` file
+
+**FAISS Index Error:**
+- Delete `vector.index` and `vector.index.keys` files
+- Restart the backend to create fresh indices
+
+**CORS Error:**
+- Verify backend is running on port 8000
+- Check CORS settings in `main.py`
+
+## 📄 License
+
+This project is licensed under the MIT License.
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## 📧 Support
+
+For issues and questions, please open an issue on the GitHub repository.
+
+---
+
+Built with ❤️ using React, FastAPI, and Google Gemini AI
