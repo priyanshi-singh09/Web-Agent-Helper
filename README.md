@@ -139,3 +139,62 @@ Submit a search query and receive an AI-generated summary.
 6. **Summarization**: Gemini AI generates a concise summary of the combined content
 7. **Caching**: Stores result in Redis and adds vector embedding to FAISS index
 8. **Response**: Returns summary to the user
+
+## 🛠️ Development
+
+### Backend Development
+
+```bash
+# Run with auto-reload
+uvicorn main:app --reload
+
+# Run tests (if available)
+pytest
+```
+
+### Frontend Development
+
+```bash
+# Development server
+npm run dev
+
+# Build for production
+npm run build
+
+# Preview production build
+npm run preview
+
+# Lint code
+npm run lint
+```
+
+## 📦 Production Deployment
+
+### Backend
+
+1. Update CORS origins in `main.py`:
+```python
+allow_origins=["https://your-frontend-domain.com"]
+```
+
+2. Use a production WSGI server:
+```bash
+gunicorn -w 4 -k uvicorn.workers.UvicornWorker main:app
+```
+
+### Frontend
+
+1. Build the production bundle:
+```bash
+npm run build
+```
+
+2. Deploy the `dist` folder to your hosting service (Vercel, Netlify, etc.)
+
+## 🔒 Security Considerations
+
+- Never commit your `.env` file or API keys
+- Use environment variables for sensitive data
+- Implement rate limiting for production
+- Add authentication for production deployments
+- Use HTTPS for all API communications
