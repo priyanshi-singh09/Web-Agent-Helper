@@ -104,3 +104,38 @@ const res = await fetch('YOUR_BACKEND_URL/query', {
     // ...
 });
 ```
+
+## 📡 API Reference
+
+### POST /query
+
+Submit a search query and receive an AI-generated summary.
+
+**Request Body:**
+```json
+{
+  "text": "your search query here"
+}
+```
+
+**Response:**
+```json
+{
+  "answer": "AI-generated summary of search results"
+}
+```
+
+**Status Codes:**
+- 200: Success
+- 500: Internal server error
+
+## 🎯 How It Works
+
+1. **Query Submission**: User submits a question through the web interface
+2. **Validation**: Gemini AI validates if the query is a valid search query
+3. **Cache Check**: System checks both Redis (exact match) and FAISS (semantic similarity)
+4. **Web Search**: If not cached, performs DuckDuckGo search and scrapes top 5 results
+5. **Content Extraction**: Extracts relevant paragraphs from each result page
+6. **Summarization**: Gemini AI generates a concise summary of the combined content
+7. **Caching**: Stores result in Redis and adds vector embedding to FAISS index
+8. **Response**: Returns summary to the user
